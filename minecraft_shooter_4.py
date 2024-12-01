@@ -19,8 +19,8 @@ player_hurt = pygame.mixer.Sound('player_hit.mp3')
 
 song = pygame.mixer.Sound('haggstrom.ogg')
 # Setup
-w = 400*2
-h = 300*2
+w = 400*2.5
+h = 300*2.5
 screen = pygame.display.set_mode([w, h])
 clock = pygame.time.Clock()
 
@@ -65,9 +65,7 @@ land_mask_image = land_mask.to_surface()
 # HP
 heart = pygame.image.load('heart.png')
 heart = pygame.transform.scale(heart, (1188*w/(6400*3), 1188*w/(6400*3)))
-# Died
-die = pygame.image.load('youdied.png')
-die = pygame.transform.scale(die, (w, h))
+
 class Mob:
     def __init__(self, pos, image, speed):
         self.pos = pos
