@@ -193,6 +193,7 @@ while running:
     score = 0
     
     game_tick = 0
+    fps = 30
     
     level = 1
     rate = 90
@@ -276,7 +277,13 @@ while running:
                         
         for mob in mobs:
             mob.draw()
-
+            
+            #Check if creeper:
+            '''
+            if mob.mob[0] == "c":
+                if mob.tick == 335:
+                    fps = 0
+                    '''
             mob.change_amount()
             if mob.mob == "c":
                 if mob.tick < 300:
@@ -284,6 +291,10 @@ while running:
                 mob.tick += 1
                 if mob.tick == 300 or mob.tick == 301:
                     creeper_hiss.play()
+                
+                # Creeper boom at tick=340
+
+
                 if mob.tick > 300 and mob.tick%5 == 0:
                     mob.change(cf)
                     
@@ -468,12 +479,16 @@ while running:
         
         steve.hittick += 1
         steve.shottick += 1
+        
+        if fps < 30:
+            fps += 5
+            
         pygame.display.flip()
-        clock.tick(30)
-        '''
+        clock.tick(fps)
+        
         for mob in mobs:
-            print(mob.mob + ": Speed " + str(mob.speed_x) + " Starts at " + str(mob.speed))
-            '''
+            print(mob.mob + str(mob.tick))
+
         
     if running:
         over = True
