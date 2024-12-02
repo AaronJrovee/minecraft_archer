@@ -485,9 +485,7 @@ while running:
             
         pygame.display.flip()
         clock.tick(fps)
-        
-        for mob in mobs:
-            print(mob.mob + str(mob.tick))
+
 
         
     if running:
