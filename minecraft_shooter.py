@@ -15,6 +15,10 @@ creeper_boom = pygame.mixer.Sound('explode.ogg')
 creeper_hurt = pygame.mixer.Sound('creeper_hurt.ogg')
 creeper_death = pygame.mixer.Sound('creeper_death.ogg')
 
+spider_death = pygame.mixer.Sound('spider_death.ogg')
+spider_hurt = pygame.mixer.Sound('spider_hurt.ogg')
+spider_step = pygame.mixer.Sound('spider_step.ogg')
+
 player_hurt = pygame.mixer.Sound('player_hit.mp3')
 
 song = pygame.mixer.Sound('haggstrom.ogg')
@@ -42,6 +46,11 @@ zc = pygame.image.load('z+c.png')
 zc = pygame.transform.scale(zc, (216*w/1500, 339*w/1500))
 zch = pygame.image.load('zch.png')
 zch = pygame.transform.scale(zch, (216*w/1500, 339*w/1500))
+
+sp = pygame.image.load('spider.png')
+sp = pygame.transform.scale(sp, (381*w/2150, 283*w/2150))
+sph = pygame.image.load('sph.png')
+sph = pygame.transform.scale(sph, (381*w/2100, 283*w/2100))
 
 
 boom = pygame.image.load('boom.png')
@@ -80,7 +89,11 @@ class Mob:
             self.mob = "zc"
         elif self.image == st:
             self.mob = "st"
-            
+        elif self.image == sp:
+            self.mob = "sp"
+            self.hp = 2
+        
+        
         if self.mob == "st":
             self.hittick = 0
             self.shottick = 0
@@ -102,7 +115,7 @@ class Mob:
         
     def change(self, image):
         self.image = image
-        
+        self.tick = 0
         if self.image == c:
             self.mob = "c"
         elif self.image == cf:
@@ -115,6 +128,8 @@ class Mob:
             self.mob = "boom"
         elif self.image == st:
             self.mob = "st"
+        elif self.image == sp:
+            self.mob = "sp"
         #Hit images
         elif self.image == ch:
             self.mob = "ch"
@@ -124,7 +139,8 @@ class Mob:
             self.mob = "zch"
         elif self.image == sth:
             self.mob = "sth"
-
+        elif self.image == sph:
+            self.mob = "sph"
             # Flip
         if self.speed > 0:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -206,7 +222,7 @@ while running:
     while alive:
         screen.fill((0,0,0))
         screen.blit(land, (0,0))
-        
+
         if game_tick%900 == 0:
             song.play()
             
@@ -228,6 +244,7 @@ while running:
                         steve.shottick = 0
                         
         # Spawn
+            
         if game_tick%rate == 0:
             
             if mobs_left == 0: # End of level
@@ -250,26 +267,38 @@ while running:
                     
                     if random.randint(0, 1) == 0:
                         if random.randint(1, 3) == 3:
-                            mobs.append(Mob((0.9*w, 0.9*h), c, -w/800))
+                            if random.randint(0,1)==0:
+                                mobs.append(Mob((0.9*w, 0.9*h), c, -w/800))
+                            else:
+                                mobs.append(Mob((0.9*w, 0.9*h), sp, -w/150))
                         else:
                             mobs.append(Mob((0.9*w, 0.9*h), z, -w/400))
                             zombie_spawn.play()
                     else:
                         if random.randint(1, 3) == 3:
-                            mobs.append(Mob((0.9*w, 0), c, -w/800))
+                            if random.randint(0,1)==0:
+                                mobs.append(Mob((0.9*w, 0), c, -w/800))
+                            else:
+                                mobs.append(Mob((0.9*w, 0), sp, -w/150))
                         else:
                             mobs.append(Mob((0.9*w, 0), z, -w/400))
                             zombie_spawn.play()
                 else:
                     if random.randint(0, 1) == 0:
                         if random.randint(1, 3) == 3:
-                            mobs.append(Mob((-w/80, 0.9*h), c, w/800))
+                            if random.randint(0,1)==0:
+                                mobs.append(Mob((-w/80, 0.9*h), c, w/800))
+                            else:
+                                mobs.append(Mob((-w/80, 0.9*h), sp, w/150))
                         else:
                             mobs.append(Mob((-w/80, 0.9*h), z, w/400))
                             zombie_spawn.play()
                     else:
                         if random.randint(1, 3) == 3:
-                            mobs.append(Mob((-w/80, 0), c, w/800))
+                            if random.randint(0,1)==0:
+                                mobs.append(Mob((-w/80, 0), c, w/800))
+                            else:
+                                mobs.append(Mob((-w/80, 0), sp, w/150))
                         else:
                             mobs.append(Mob((-w/80, 0), z, w/400))
                             zombie_spawn.play()
@@ -277,14 +306,10 @@ while running:
                         
         for mob in mobs:
             mob.draw()
-            
-            #Check if creeper:
-            '''
-            if mob.mob[0] == "c":
-                if mob.tick == 335:
-                    fps = 0
-                    '''
             mob.change_amount()
+            if mob.r.x < -w/8 or mob.r.x > w + w/8:
+                mobs.remove(mob)
+            
             if mob.mob == "c":
                 if mob.tick < 300:
                     mob.move(mob.speed)
@@ -339,21 +364,36 @@ while running:
                         
                     item.tick = 300
                     mobs.append(item)
+                    
             elif mob.mob == "zh":
                 mob.move(mob.speed)
                 mob.tick += 1
-                if mob.tick%10==0:
+                if mob.tick%15==0:
                     mob.change(z)
             elif mob.mob == "ch":
                 mob.move(mob.speed)
                 mob.tick += 1
-                if mob.tick%10==0:
+                if mob.tick%15==0:
                     mob.change(c)
             elif mob.mob == "zch":
                 mob.move(mob.speed)
                 mob.tick += 1
                 if mob.tick%15==0:
                     mob.change(zc)
+                    
+                    
+            elif mob.mob == "sp":
+                mob.tick += 1
+                mob.move(mob.speed)
+                if mob.tick%30 == 0:
+                    spider_step.play()
+                    
+            elif mob.mob == "sph":
+                mob.move(mob.speed)
+                mob.tick += 1
+                if mob.tick%15 == 0:
+                    mob.change(sp)
+                
         for arrow in arrows:
             arrow.move()
             arrow.draw()
@@ -381,6 +421,7 @@ while running:
                         mob.change(ch)
                         if mob.hp > 0:
                             creeper_hurt.play()
+                            
                     elif mob.mob == "zc":
                         mob.change(zch)
                         if mob.hp > 0:
@@ -388,7 +429,13 @@ while running:
                                 zombie_hurt1.play()
                             else:
                                 zombie_hurt2.play()
-
+                    
+                    
+                    elif mob.mob == "sp":
+                        mob.change(sph)
+                        if mob.hp > 0:
+                            spider_hurt.play()
+                    
                     if mob.hp <= 0:
                         mobs.remove(mob)
                         # Score
@@ -402,6 +449,10 @@ while running:
                             zombie_death.play()
                             # Give the creeper back
                             mobs.append(Mob((mob.r.x, mob.r.y), c, mob.speed/abs(mob.speed)*w/800))
+                            
+                        elif mob.mob == "sph":
+                            spider_death.play()
+
                     if arrow in arrows: # If arrows contains arrow
                         arrows.remove(arrow)
         # Steve        
@@ -430,15 +481,18 @@ while running:
                     steve.hp -= 1
                 elif mob.mob == "boom":
                     steve.hp -= 4
+                elif mob.mob == "sp":
+                    steve.hp -= 1
+                    
                 elif mob.mob == "c" and mob.tick < 300:
                     mob.tick = 300
-                if mob.mob == "z" or mob.mob == "boom":
+                if mob.mob == "z" or mob.mob == "boom" or mob.mob == "sp":
                     steve.change(sth)
                     steve.hittick = 0
                     player_hurt.play()
                 if steve.hp < 1:
                     alive = False
-                if mob.mob == "z" or mob.mob == "boom":
+                if mob.mob == "z" or mob.mob == "boom" or mob.mob == "sp":
                     if steve.mask.overlap(land_mask, (-steve.r.x, -steve.r.y)):
                         steve.speed_y = -w/53.33 # -15
                 
