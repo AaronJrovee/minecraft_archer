@@ -20,6 +20,8 @@ spider_hurt = pygame.mixer.Sound('spider_hurt.ogg')
 spider_step = pygame.mixer.Sound('spider_step.ogg')
 
 player_hurt = pygame.mixer.Sound('player_hit.mp3')
+arrow_fired = pygame.mixer.Sound('arrow_fired.ogg')
+
 
 song = pygame.mixer.Sound('haggstrom.ogg')
 # Setup
@@ -56,7 +58,7 @@ sph = pygame.transform.scale(sph, (381*w/2100, 283*w/2100))
 boom = pygame.image.load('boom.png')
 boom = pygame.transform.scale(boom, (500*w/1600, 500*w/1600))
 
-# Player
+# Players
 st = pygame.image.load('steve.png')
 st = pygame.transform.scale(st, (157*w/1200, 277*w/1200))
 
@@ -91,7 +93,7 @@ class Mob:
             self.mob = "st"
         elif self.image == sp:
             self.mob = "sp"
-            self.hp = 2
+            self.hp = 3
         
         
         if self.mob == "st":
@@ -240,9 +242,11 @@ while running:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     if not steve.image == sth and steve.shottick > 10:
+                        arrow_fired.play()
                         arrows.append(Arrow((steve.r.x, steve.r.y + 277*w/3600), steve.speed))
                         steve.shottick = 0
-                        
+                
+                
         # Spawn
             
         if game_tick%rate == 0:
